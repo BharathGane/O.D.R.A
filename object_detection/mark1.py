@@ -1,38 +1,43 @@
 import cv2
-from matplotlib import pyplot as plt
 import sys
-img = cv2.imread(sys.argv[1],0)
-img2 = img.copy()
+from matplotlib import pyplot as plot
 
-template = cv2.imread('template.jpg',0)
-h, w = template.shape[::]
+class object_detect(object):
+	def __init__(self):
+		self.methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
 
-# methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
-			# 'cv2.TM_CCORR_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
-methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
+	def process(self,img,template):
+		template = cv2.imread(template,0)
+		height, width = template.shape[::]
 
-for meth in methods:
-	img = img2.copy()
-	method = eval(meth)
+		# methods = ['cv2.TM_CCOEFF']
 
-	res = cv2.matchTemplate(img,template,method)
-	min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+		img2 = img.copy()
+		for method in self.methods:
+			img = img2.copy()
+			method = eval(method)
 
-	if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
-		top_left = min_loc
-	else:
-		top_left = max_loc
-	bottom_right = (top_left[0] + w, top_left[1] + h)
-	bottom_left = (top_left[0],top_left[1] + h)
-	top_right = (top_left[0] + w,top_left[1])
-	
-	print top_left,top_right,bottom_right,bottom_left
-	cv2.rectangle(img,top_left, bottom_right, 255, 2)
-	plt.imshow(img,cmap = 'gray')
-	plt.imshow(img,cmap = 'gray')
-	# plt.plot([top_left[0],top_right[0],bottom_right[0],bottom_left[0]],[top_left[1],top_right[1],bottom_right[1],bottom_left[1]])
-	# plt.scatter(top_left[0],top_left[1])
-	# plt.scatter(top_right[0],top_right[1])
-	# plt.scatter(bottom_right[0],bottom_right[1])
-	# plt.scatter(bottom_left[0],bottom_left[1])
-	plt.show()
+			res = cv2.matchTemplate(img,template,method)
+			min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+
+			if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
+				top_left = min_loc
+			else:
+				top_left = max_loc
+			bottom_right = (top_left[0] + width, top_left[1] + height)
+			bottom_left = (top_left[0],top_left[1] + height)
+			top_right = (top_left[0] + width,top_left[1])
+
+			print top_left,top_right,bottom_right,bottom_left
+			plot.imshow(img)
+			plot.scatter(top_left[0],top_left[1])
+			plot.scatter(top_right[0],top_right[1])
+			plot.scatter(bottom_right[0],bottom_right[1])
+			plot.scatter(bottom_left[0],bottom_left[1])
+			plot.show()
+
+if __name__ == "__main__":
+	img = cv2.imread(sys.argv[1],0)
+	template_file = str(sys.argv[2])+'.jpg'
+	object1 = object_detect()
+	object1.process(img,template_file)
